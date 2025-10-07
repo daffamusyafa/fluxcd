@@ -1,14 +1,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: podinfo-staging
+  name: podinfo
   namespace: flux-system
 spec:
   interval: 1m
-  path: ./staging/podinfo
+  path: ./clusters/my-cluster/podinfo
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
   targetNamespace: podinfo-app
-

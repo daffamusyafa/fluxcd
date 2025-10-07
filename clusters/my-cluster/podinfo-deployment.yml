@@ -1,9 +1,17 @@
 # podinfo-deployment.yml
 
+# 0. Namespace: Membuat namespace untuk aplikasi podinfo
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: podinfo-app # <-- NAMA NAMESPACE BARU
+---
+# 1. Deployment: Defines the desired state for your application pods.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: podinfo
+  namespace: podinfo-app # <-- TAMBAHKAN BARIS INI
 spec:
   replicas: 2
   selector:
@@ -16,17 +24,17 @@ spec:
     spec:
       containers:
       - name: podinfo
-        image: ghcr.io/stefanprodan/podinfo # <-- HAPUS TAG VERSI DI SINI
-        # {"$imagepolicy": "flux-system:podinfo"} # <-- TAMBAHKAN BARIS KOMENTAR INI
+        image: ghcr.io/stefanprodan/podinfo
+        # {"$imagepolicy": "flux-system:podinfo"}
         ports:
         - containerPort: 9898
-
 ---
-
+# 2. Service: Creates a stable network endpoint to access the pods.
 apiVersion: v1
 kind: Service
 metadata:
   name: podinfo
+  namespace: podinfo-app # <-- TAMBAHKAN BARIS INI
 spec:
   selector:
     app: podinfo
@@ -34,13 +42,13 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 9898
-
 ---
-
+# 3. Route: Exposes the Service with a public URL (OpenShift specific).
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: podinfo
+  namespace: podinfo-app # <-- TAMBAHKAN BARIS INI
 spec:
   to:
     kind: Service

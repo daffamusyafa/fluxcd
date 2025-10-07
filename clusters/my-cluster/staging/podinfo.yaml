@@ -1,31 +1,19 @@
-# clusters/my-cluster/staging/podinfo.yaml
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
 metadata:
   name: podinfo-staging
+  namespace: flux-system
 spec:
-  replicas: 1 # Cukup 1 untuk testing
-  selector:
-    matchLabels:
-      app: podinfo-staging
-  template:
-    metadata:
-      labels:
-        app: podinfo-staging
-    spec:
-      containers:
-      - name: podinfo
-        image: ghcr.io/stefanprodan/podinfo:6.6.0 # <-- Versi baru untuk diuji
-        ports:
-        - containerPort: 9898
+  interval: 1m
+  path: "./staging" # Path baru untuk konfigurasi staging
+  prune: true
+  targetNamespace: podinfo-staging # Akan di-deploy ke namespace baru
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    branch: staging 
 ---
 apiVersion: v1
-kind: Service
+kind: Namespace
 metadata:
   name: podinfo-staging
-spec:
-  selector:
-    app: podinfo-staging
-  ports:
-    - port: 80
-      targetPort: 9898
